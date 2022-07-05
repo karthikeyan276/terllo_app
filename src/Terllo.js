@@ -12,12 +12,16 @@ import { experimentalStyled as styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import { Link ,Navigate } from 'react-router-dom';
+import Menu from '@mui/material/Menu';
+import Login from './Login';
+import Profile from './Profile';
+// import MenuItem from '@mui/material/MenuItem'
 
 
 export default class Terllo extends Component {
-  constructor(){
-    super()
-    this.state=({
+  constructor(props){
+    super(props)
+    this.state={
       open:false,
       input:"",
       inprogress:[],
@@ -37,9 +41,24 @@ export default class Terllo extends Component {
       open_catagary:[],
       open_input:[],
       select_open:[],
-      navigate:""
-    })
+      navigate:"",
+      anchorEl:null,
+      local_ids:[]
+    }
   }
+  
+  anchorEl_click=(event)=>{
+      this.setState({anchorEl:event.currentTarget})
+  }
+  anchorEl_close=()=>{
+    this.setState({anchorEl:null})
+  }
+
+profile=()=>{
+
+}
+
+
   handleOpen = () =>{
     this.setState({open:true})
   }
@@ -75,13 +94,11 @@ this.setState({open_model:true,open_id:id,open_catagary:catagrary,open_input:inp
 
  submit_details=()=>{
   
-    // let datas=[]
-    // datas.push({input:this.state.input,inprogress:this.state.inprogress})
-    // localStorage.setItem("inprogress", JSON.stringify(datas));
-    // console.log('llll',datas)
+   
     Axios.post(`http://localhost:8001/adddtetails`,{
       input:this.state.input,
       inprogress:this.state.inprogress,
+      local_ids:this.state.local_ids
      
     }).then((response)=>{
       console.log('sucess')
@@ -174,8 +191,8 @@ update_db=()=>{
     }).then((response)=>{
     
       this.setState({
-        completed_db: [
-          ...this.state.completed_db,
+        data_from_db: [
+          ...this.state.data_from_db,
           {
             
             id:this.state.id_get,
@@ -199,8 +216,8 @@ update_completed=()=>{
 
   }).then((response)=>{
     this.setState({
-      done_data: [
-        ...this.state.done_data,
+      data_from_db: [
+        ...this.state.data_from_db,
         {
           
           id:this.state.id_get_completed,
@@ -212,6 +229,7 @@ update_completed=()=>{
   })
 
 }
+
 
 update_done=()=>{
   Axios.post(`http://localhost:8001/update_done`,{
@@ -257,16 +275,25 @@ logout_1=()=>{
     alert("plz wait ")
   }
 }
+idget=()=>{
+  let user_email = JSON.parse(localStorage.getItem("user_email"))||[]
+      console.log("user_email",user_email)
+      this.setState({local_ids:user_email})
+      
+ }
 
  componentDidMount=()=>{
   this.data_get()
-  this.data_get_completed()
-  this.data_get_done()
+ this.idget()
+ 
  }
+
+ 
   render() {
     if(localStorage.getItem("user")==null){
       return <Navigate to="/Login"/>
   }
+  
     const style = {
       position: 'absolute',
       top: '50%',
@@ -286,16 +313,28 @@ logout_1=()=>{
       },
     }));
       // console.log('db',this.state.completed_db)
-      console.log('gass',this.state.select_open)
+      console.log('gass',this.state.local_ids)
 
 
       //response data
       const data = this.state.data_from_db
       const changetocompleted = this.state.completed_db
       const done = this.state.done_data
+      // const props_id = this.props
+
+      // console.log("props_id",props_id)
+
+      const inprogress = data.filter(e=>e.catagrary=="inprogress")
+      const completed_1=data.filter(e=>e.catagrary=="completed")
+      const open_1=data.filter(d=>d.catagrary=="Open")
+
+      console.log("inprogress",inprogress)
+      console.log("completed",completed_1)
+      console.log("open_1",open_1)
       console.log("daasss",done)
 
       // console.log("data",data)
+      const open = Boolean(this.state.anchorEl);
 
       const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -304,12 +343,45 @@ logout_1=()=>{
         textAlign: 'center',
         color: theme.palette.text.secondary,
       }));
-      
+
+
+
+      let user_email = JSON.parse(localStorage.getItem("user_email"))||[]
+      console.log("user_email",user_email)
+
+    let id_id=  user_email.map(d=>d.id)
     return (
       <div style={{backgroundColor:"rgb(34,193,195)"}}>
-          
+         
+          {console.log("props",this.state.local_ids)}
 <div style={{backgroundColor:'black',color:"white",width:"100%",height:'80px'}}>
-
+<Button
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={this.anchorEl_click}
+        variant="contained" color="success"
+        sx={{mt:3,mr:2}}
+      >
+        Dashboard
+      </Button>
+      <Menu
+        id="basic-menu"
+        anchorEl={this.state.anchorEl}
+        open={open}
+        onClose={this.anchorEl_close}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <Link to="/Profile">
+          <MenuItem style={{textDecoration:"none"}} >Profile</MenuItem>
+        </Link>
+      
+        
+        <MenuItem onClick={this.logout_1}>Logout</MenuItem>
+      </Menu>
  <Button variant='contained' sx={{
     ':hover': {
       bgcolor: 'pink.main', // theme.palette.primary.main
@@ -330,7 +402,7 @@ logout_1=()=>{
         onClose={this.handleClose}
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
-        sx={{backgroundColor:'beige'}}
+        // sx={{backgroundColor:'beige'}}
         
       >
         <Box sx={style}>
@@ -363,19 +435,8 @@ logout_1=()=>{
             {/* <StyledButton sx={{mt:5}} onClick={this.submit_details} variant="contained" color="primary">Submit</StyledButton> */}
         </Box>
         </Modal>
+    
        
-        {/* {
-          data.map((d,index)=>{
-              return(
-                <div key={index}>
-                    <h1>{d.id}</h1>
-                    <h1>{d.input}</h1>
-                    <h1>{d.catagrary}</h1>
-      
-                  </div>
-              )
-          })
-        } */}
         <Modal
         keepMounted
         open={this.state.model_new}
@@ -413,7 +474,7 @@ logout_1=()=>{
         </Modal>
            <Box sx={{ flexGrow: 1 ,mt:2,ml:1,mr:1}}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {data.map((d,index) => (
+        {inprogress.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:'#FFFFFF'}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
@@ -468,7 +529,7 @@ logout_1=()=>{
 
     <Box sx={{ flexGrow: 1,mt:10 }}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {changetocompleted.map((d,index) => (
+        {completed_1.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:'#FFFFFF',ml:1,mr:1}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
@@ -523,7 +584,7 @@ logout_1=()=>{
     <h1>Open</h1>
     <Box sx={{ flexGrow: 1,mt:10 }}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {done.map((d,index) => (
+        {open_1.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:' #FFFFFF',ml:1,mr:1,mb:2}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
@@ -537,6 +598,7 @@ logout_1=()=>{
       </Grid>
     </Box>
     </div>
+   
       </div>
     )
   }

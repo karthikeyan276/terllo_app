@@ -14,52 +14,95 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import  Axios  from 'axios';
 import { Link ,Navigate } from 'react-router-dom';
+import Terllo from './Terllo';
 
 export default class Login extends Component {
     constructor(){
         super()
-        this.state=({
+        this.state={
             Email:'',
             Password:"",
-            data:[],
-            navigate:""
-        })
+            data_get:[],
+            id_get:"",
+            navigate:"",
+            send_id:[]
+        }
     }
+
+id_getting =()=>{
+  const datass = this.state.data_get
+    // const id_get = datass.map(d=>d.id)
+    console.log('gettingg',datass)
+    // this.setState({send_id:this.id_get})
+}
+
+// shouldComponentUpdate=()=>{
+//   this.id_getting()
+// }
+
     sigin=(e)=>{
         e.preventDefault()
+        // console.log("--->>>>",id_get)
       Axios.post(`http://localhost:8001/user`,{
         Email:this.state.Email,
         Password:this.state.Password
       }).then((response)=>{
         console.log('ss',response.data.results)
+      
         if( response.data.results.length > 0 && response.data.message === "sucess"){
             console.log("ok");
+            console.log('email',response.data.results)
 
             this.setState({
-                navigate:<Navigate to='/Terllo'></Navigate>            
+                navigate:<Navigate to='/Terllo'></Navigate>  ,  
+                data_get:response.data.results      
             })
-            localStorage.setItem("user","keyyy");
-                    
+           
+
+
+            localStorage.setItem("user","keyyy");  
+
+            const datass = response.data.results
+            console.log("dsdsd",datass)
+            const id_get = datass.map(d=>d.id)
+     
+            localStorage.setItem("user_email", JSON.stringify(id_get));
+                       
 
            }else{
-
-            alert("Plz check email or password incorrect")
+     alert("Plz check email or password incorrect")
 
            }
       })
     }
+    // componentDidMount=()=>{
+    //   this.sigin()
+    // }
   render() {
+    
+    
     if(localStorage.getItem("user")=="keyyy"){
         return <Navigate to="/Terllo"/>
     }
+    const getting_id = this.state.send_id
+    console.log("send id", getting_id)
     const theme = createTheme();
-    // console.log("jj",this.state.Email)
+    // console.log("jj",this.state.data)
+    
+    // const id_get = datass.map(d=>d.id)
+    
+
+    // let new_id = id_get
+    // console.log('datass',new_id)
+   
+    // console.log('>>>>>>',this.state.data_get)
+
 
     return (
       <div>
-
+{/* <Terllo  key={"value"}/> */}
 <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
+      <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
           item
@@ -92,6 +135,7 @@ export default class Login extends Component {
               Sign in
             </Typography>
             <p>{this.state.navigate}</p>
+            <p>{this.state.data}</p>
             <Box component="form"  sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
@@ -125,6 +169,7 @@ export default class Login extends Component {
               >
                 Sign In
               </Button>
+              {/* <Button onClick={this.id_getting}>dhfd</Button> */}
               <Grid container>
                 
                 <Grid item>
@@ -134,11 +179,17 @@ export default class Login extends Component {
                 </Grid>
               </Grid>
               {/* <Copyright sx={{ mt: 5 }} /> */}
+              
+              {/* {"dd"?<Terllo dats={this.state.data_get}/>:""} */}
+
+              {/* <Terllo data={getting_id}/> */}
+
             </Box>
           </Box>
         </Grid>
       </Grid>
     </ThemeProvider>
+    {/* <Terllo datass="sndsnsjnd"/> */}
       </div>
     )
   }

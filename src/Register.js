@@ -17,27 +17,52 @@ import Axios from 'axios'
 export default class Register extends Component {
     constructor(){
         super()
-        this.state=({
+        this.state={
             First_name:'',
             Last_name:'',
             Email:'',
             Password:'',
-            confirmpassword:''
-        })
+            confirmpassword:'',
+            data_from_db:[]
+        }
     }
+ 
+    dataget =()=>{
+      Axios.get(`http://localhost:8001/userdata`,{
+
+  }).then((response)=>{
+    console.log('sucess',response.data.results)
+   
+
+    this.setState({
+      data_from_db:response.data.results
+
+    })
+  })
+    }
+    componentDidMount=()=>{
+      this.dataget()
+    }
+
     register=(e)=>{
         e.preventDefault()
+        
         const { Email, Password, confirmpassword } = this.state;
+        const data_from_db = this.state
+        // let emails = data_from_db.map((x) => x.email);
+        // console.log("hhhhh",emails)
         let emailexp = ( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
+        const password_1 = ("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$");
         if (!Email.match(emailexp)) {
             alert("Please enter valid email id")
         }
-        else if (Password.length < 4) {
-            alert("password  4 charecters")
+        else if (!Password.match(password_1)) {
+            alert("plz use strong password")
         }
         else if (Password !== confirmpassword) {
             alert("password  not match")
         }
+       
         
         else {
             Axios.post(`http://localhost:8001/user_login`,{
@@ -45,15 +70,18 @@ export default class Register extends Component {
             First_name:this.state.First_name,
             Last_name:this.state.Last_name,
             email:this.state.Email,
-                password:this.state.Password,
+            password:this.state.Password,
                 
             }).then((response)=>{
                 console.log('success',response)
-                this.setState({First_name:'',Last_name:"",Email:"",Password:"",confirmpassword:"",})
+                console.log('email',response.data.results)
+                this.setState({First_name:"",Last_name:"",Email:"",Password:"",confirmpassword:""})
+                
             }).catch(err=>{
                 console.log(err)
           
             })
+            alert('login sucess')
         }
     
     }
@@ -96,7 +124,7 @@ export default class Register extends Component {
                   autoFocus
                   onChange={(e)=>this.setState({First_name:e.target.value})}
                   
-          
+                  value={this.state.First_name}
                   
           
                 />
@@ -110,6 +138,7 @@ export default class Register extends Component {
                   name="lastName"
                   autoComplete="family-name"
                   onChange={(e)=>this.setState({Last_name:e.target.value})}
+                  value={this.state.Last_name}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -121,6 +150,7 @@ export default class Register extends Component {
                   name="email"
                   autoComplete="email"
                   onChange={(e)=>this.setState({Email:e.target.value})}
+                  value={this.state.Email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -133,6 +163,7 @@ export default class Register extends Component {
                   id="password"
                   autoComplete="new-password"
                   onChange={(e)=>this.setState({Password:e.target.value})}
+                  value={this.state.Password}
                 />
                 
               </Grid>
@@ -146,6 +177,7 @@ export default class Register extends Component {
                   id="confrom password"
                   autoComplete="new-password"
                   onChange={(e)=>this.setState({confirmpassword:e.target.value})}
+                  value={this.state.confirmpassword}
                 />
               </Grid>
               

@@ -17,7 +17,8 @@ app.post(`/adddtetails`,(req,res)=>{
 
     const input=req.body.input;
     const inprogress= req.body.inprogress
-    db.query(`INSERT INTO terllo (input,catagrary)VALUES(?,?)`,[input,inprogress],(err,result)=>{
+    const local_ids=req.body.local_ids
+    db.query(`INSERT INTO terllo (input,catagrary,user_id)VALUES(?,?,?)`,[input,inprogress,local_ids],(err,result)=>{
         if(err){
             console.log(err)
         }else{
@@ -31,7 +32,7 @@ app.post(`/adddtetails`,(req,res)=>{
 })
 
 app.get(`/dataall`,(req,res)=>{
-    db.query(`select id,input,catagrary from terllo where catagrary ='inprogress'`,(err,result)=>{
+    db.query(`select id,input,catagrary from terllo `,(err,result)=>{
         if(err){
             console.log(err)
         }else{
@@ -194,7 +195,37 @@ app.post(`/user`,(req,res)=>{
 
     const Email=req.body.Email
     const Password = req.body.Password
-    db.query(`select First_name,Last_name from user_regirster ur where Email="${Email}" && password=${Password}`,(err,result)=>{
+    db.query(`select First_name,Last_name,Email,id from user_regirster ur where Email="${Email}" && password="${Password}"`,(err,result)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.send({message:"sucess",results:result})
+        }
+    })
+    db.connect((err)=>{
+        err? console.log(err): console.log("connected")
+    })
+ 
+})
+
+
+app.get(`/userdata`,(req,res)=>{
+    db.query(`select Email from user_regirster`,(err,result)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.send({message:'good work',results:result})
+        }
+    })
+})
+
+app.post(`/profile`,(req,res)=>{
+
+    const local_ids=req.body.local_id
+
+    console.log("local_ids",local_ids)
+    
+    db.query(`SELECT input,catagrary,user_regirster.id,user_regirster .First_name  FROM terllo inner JOIN user_regirster ON user_regirster.id=terllo.user_id WHERE user_regirster.id=${local_ids}`,(err,result)=>{
         if(err){
             console.log(err)
         }else{
