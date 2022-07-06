@@ -32,7 +32,9 @@ app.post(`/adddtetails`,(req,res)=>{
 })
 
 app.get(`/dataall`,(req,res)=>{
-    db.query(`select id,input,catagrary from terllo `,(err,result)=>{
+    const local_ids = req.params.local_ids
+    console.log("local_idslocal_ids",local_ids)
+    db.query(`select id,input,catagrary,user_id from terllo `,(err,result)=>{
         if(err){
             console.log(err)
         }else{
@@ -179,11 +181,14 @@ app.post(`/user_login`,(req,res)=>{
     const Password = req.body.password;
     const First_name=req.body.First_name;
     const Last_name=req.body.Last_name
-    db.query(`INSERT INTO user_regirster (First_name,Last_name,Email,Password)VALUES(?,?,?,?)`,[First_name,Last_name,Email,Password],(err,result)=>{
+    db.query(`INSERT INTO user_regirster1 (First_name,Last_name,Email,Password)VALUES(?,?,?,?)`,[First_name,Last_name,Email,Password],(err,result)=>{
         if(err){
-            console.log(err)
+            console.log("hhhh",err)
+        
+            res.status(500).send({message:"error",errors:err})
+
         }else{
-            res.send({message:"sucess",results:result})
+            res.send({message:"sucess",results:result,errors:err})
         }
     })
     db.connect((err)=>{
@@ -195,7 +200,7 @@ app.post(`/user`,(req,res)=>{
 
     const Email=req.body.Email
     const Password = req.body.Password
-    db.query(`select First_name,Last_name,Email,id from user_regirster ur where Email="${Email}" && password="${Password}"`,(err,result)=>{
+    db.query(`select First_name,Last_name,Email,id from user_regirster1 ur where Email="${Email}" && password="${Password}"`,(err,result)=>{
         if(err){
             console.log(err)
         }else{
@@ -210,7 +215,7 @@ app.post(`/user`,(req,res)=>{
 
 
 app.get(`/userdata`,(req,res)=>{
-    db.query(`select Email from user_regirster`,(err,result)=>{
+    db.query(`select Email from user_regirster1`,(err,result)=>{
         if(err){
             console.log(err)
         }else{
@@ -225,11 +230,12 @@ app.post(`/profile`,(req,res)=>{
 
     console.log("local_ids",local_ids)
     
-    db.query(`SELECT input,catagrary,user_regirster.id,user_regirster .First_name  FROM terllo inner JOIN user_regirster ON user_regirster.id=terllo.user_id WHERE user_regirster.id=${local_ids}`,(err,result)=>{
+    db.query(`SELECT input,catagrary,user_regirster1.id,user_regirster1 .First_name  FROM terllo inner JOIN user_regirster1 ON user_regirster1.id=terllo.user_id WHERE user_regirster1.id=${local_ids}`,(err,result)=>{
         if(err){
             console.log(err)
         }else{
             res.send({message:"sucess",results:result})
+            console.log("result",result)
         }
     })
     db.connect((err)=>{
@@ -241,7 +247,7 @@ app.post(`/profile`,(req,res)=>{
 // app.post(`/user`,(req,res)=>{
 //     const Email=req.body.Email
 //     const Password = req.body.Password
-//     mysql = `select First_name,Last_name from user_regirster ur where Email="${Email}" && password=${Password}`
+//     mysql = `select First_name,Last_name from user_regirster1 ur where Email="${Email}" && password=${Password}`
 //     db.query(mysql,(err,result)=>{
 //         if(err){
 //             console.log(err)

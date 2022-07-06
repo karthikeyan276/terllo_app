@@ -6,6 +6,8 @@ import Login from './Login';
 import Profile from './Profile';
 import Register from './Register';
 import Terllo from './Terllo';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
 
@@ -13,6 +15,7 @@ function App() {
     <div className="App">
 {/* 
       <Terllo/> */}
+          <ToastContainer closeButton={false}  position="top-right" />
       <Routes>
       <Route path='/' element={<Register/>}/>
       <Route path='/Login' element={<Login/>}/>

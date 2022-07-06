@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Axios from 'axios'
+import { toast, ToastContainer } from "react-toastify";
 
 export default class Register extends Component {
     constructor(){
@@ -23,7 +24,8 @@ export default class Register extends Component {
             Email:'',
             Password:'',
             confirmpassword:'',
-            data_from_db:[]
+            data_from_db:[],
+            errors:''
         }
     }
  
@@ -54,14 +56,19 @@ export default class Register extends Component {
         let emailexp = ( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
         const password_1 = ("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$");
         if (!Email.match(emailexp)) {
-            alert("Please enter valid email id")
+     
+            toast.error("Please enter valid email id",{autoClose:1000});
         }
         else if (!Password.match(password_1)) {
-            alert("plz use strong password")
+          
+            toast.error("plz use strong password ",{autoClose:2000});
+            
         }
         else if (Password !== confirmpassword) {
-            alert("password  not match")
+          
+            toast.error("password  not match ",{autoClose:1000});
         }
+      
        
         
         else {
@@ -74,21 +81,29 @@ export default class Register extends Component {
                 
             }).then((response)=>{
                 console.log('success',response)
+               
                 console.log('email',response.data.results)
-                this.setState({First_name:"",Last_name:"",Email:"",Password:"",confirmpassword:""})
+                if(response.data.status==500){
+                  toast.error("Email all ready register",{autoClose:1000});
+                }else{
+                  console.log("error",response.data.errors)
+                  this.setState({First_name:"",Last_name:"",Email:"",Password:"",confirmpassword:""})
+                  toast.success("Register Scuessfull",{autoClose:1000});
+                }
                 
             }).catch(err=>{
-                console.log(err)
+              console.log('There was an error!', err);
+              toast.error("Email all ready register",{autoClose:1000});
           
             })
-            alert('login sucess')
+            
         }
     
     }
     
   render() {
     const theme = createTheme();
-    console.log(this.state.First_name)
+    // console.log(this.state.First_name)
     return (
       <div>
 

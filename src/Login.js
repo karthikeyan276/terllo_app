@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import  Axios  from 'axios';
 import { Link ,Navigate } from 'react-router-dom';
 import Terllo from './Terllo';
+import { toast, ToastContainer } from "react-toastify";
 
 export default class Login extends Component {
     constructor(){
@@ -55,9 +56,10 @@ id_getting =()=>{
 
             this.setState({
                 navigate:<Navigate to='/Terllo'></Navigate>  ,  
-                data_get:response.data.results      
+                data_get:response.data.results  
+               
             })
-           
+            toast.success("Login Scuessfull",{autoClose:1000});    
 
 
             localStorage.setItem("user","keyyy");  

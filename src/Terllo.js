@@ -15,6 +15,9 @@ import { Link ,Navigate } from 'react-router-dom';
 import Menu from '@mui/material/Menu';
 import Login from './Login';
 import Profile from './Profile';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css"
 // import MenuItem from '@mui/material/MenuItem'
 
 
@@ -54,9 +57,7 @@ export default class Terllo extends Component {
     this.setState({anchorEl:null})
   }
 
-profile=()=>{
 
-}
 
 
   handleOpen = () =>{
@@ -80,7 +81,7 @@ profile=()=>{
 
  handleOpen_2open=(id,input)=>{
   this.setState({model_completed:true,id_get_completed:id,input_completed:input})
-  // console.log('da',id,input)
+ 
 }
 
 handleclose_model=()=>{
@@ -89,7 +90,7 @@ handleclose_model=()=>{
 
 handleopen_model=(id,catagrary,input)=>{
 this.setState({open_model:true,open_id:id,open_catagary:catagrary,open_input:input})
-// console.log('da',id,catagrary)
+
 }
 
  submit_details=()=>{
@@ -101,24 +102,33 @@ this.setState({open_model:true,open_id:id,open_catagary:catagrary,open_input:inp
       local_ids:this.state.local_ids
      
     }).then((response)=>{
-      console.log('sucess')
+      toast("Task added", {
+       
+        icon: "🚀",
+        autoClose:1000
+      })
+      console.log('sucess',response.data.results)
       this.setState({
-        data_from_db: [
+        open:false,
+      data_from_db: [
           ...this.state.data_from_db,
           {
             id : response.data.results.insertId,
             input:this.state.input,
-            inprogress:this.state.inprogress
+            inprogress:this.state.inprogress,
+            local_ids:this.state.local_ids
           }
         ]
-  
+      
       })
     })
+
     
 
  }
 
  data_get=()=>{
+  let local_ids=this.state.local_ids
   Axios.get(`http://localhost:8001/dataall`,{
 
   }).then((response)=>{
@@ -191,17 +201,29 @@ update_db=()=>{
     }).then((response)=>{
     
       this.setState({
-        data_from_db: [
-          ...this.state.data_from_db,
-          {
+        // data_from_db: [
+        //   ...this.state.data_from_db,
+        //   {
             
-            id:this.state.id_get,
-            input:this.state.datafrom,
-            updatecatgory:this.state.updatecatgory
-          }
-        ]
+        //     id:this.state.id_get,
+        //     input:this.state.datafrom,
+        //     updatecatgory:this.state.updatecatgory
+        //   }
+        // ]
+       
   
       })
+      this.setState({
+        model_new:false
+      })
+      toast("Task changed", {
+       
+        icon: "🚀",
+        autoClose:1000,
+        draggablePercent: 60
+      })
+    
+      
     })
     console.log(this.state.id_get)
 }
@@ -215,16 +237,24 @@ update_completed=()=>{
     comleted_click:this.state.comleted_click
 
   }).then((response)=>{
-    this.setState({
-      data_from_db: [
-        ...this.state.data_from_db,
-        {
+    // this.setState({
+    //   // data_from_db: [
+    //   //   ...this.state.data_from_db,
+    //   //   {
           
-          id:this.state.id_get_completed,
-          input:this.state.input_completed
-        }
-      ]
+    //   //     id:this.state.id_get_completed,
+    //   //     input:this.state.input_completed
+    //   //   }
+    //   // ]
 
+    // })
+    this.setState({
+      model_completed:false
+    })
+    toast("Task changed", {
+       
+      icon: "🚀",
+      autoClose:1000
     })
   })
 
@@ -237,19 +267,15 @@ update_done=()=>{
     input:this.state.open_catagary,
     select_open:this.state.select_open
 
-  // }).then((response)=>{
-  //   this.setState({
-  //     completed_db: [
-  //       ...this.state.done_data,
-  //       {
-          
-  //         id:this.state.open_id,
-  //         input:this.state.open_catagary,
-  //         select_open:this.state.select_open
-  //       }
-  //     ]
-
-  //   })
+  
+  }).then((r)=>{
+    this.setState({open_model:false})
+    toast("Task changed", {
+       
+      icon: "🚀",
+      autoClose:1000,
+      
+    })
   })
 
 }
@@ -260,8 +286,9 @@ delete_task = (id,index)=>{
   }).then((response)=>{
     console.log(response.status);
     console.log(response.data)
+
   })
-  // console.log("delete",id,index)
+ 
 }
 
 logout_1=()=>{
@@ -312,28 +339,30 @@ idget=()=>{
        
       },
     }));
-      // console.log('db',this.state.completed_db)
-      console.log('gass',this.state.local_ids)
+      
+      
 
 
       //response data
       const data = this.state.data_from_db
-      const changetocompleted = this.state.completed_db
-      const done = this.state.done_data
-      // const props_id = this.props
-
-      // console.log("props_id",props_id)
+      console.log("data",data)
+      const idd = this.state.local_ids
+      // const changetocompleted = this.state.completed_db
+      // const done = this.state.done_data
+    
 
       const inprogress = data.filter(e=>e.catagrary=="inprogress")
+      const inporo = inprogress.filter(e=>e.user_id==idd)
+      console.log('idd',inporo)
       const completed_1=data.filter(e=>e.catagrary=="completed")
+      const completed_datas = completed_1.filter(e=>e.user_id==idd)
+      console.log("completed_datas",completed_datas)
       const open_1=data.filter(d=>d.catagrary=="Open")
+    const open_data=open_1.filter(d=>d.user_id==idd)
+    console.log("open_data",open_data)
 
-      console.log("inprogress",inprogress)
-      console.log("completed",completed_1)
-      console.log("open_1",open_1)
-      console.log("daasss",done)
-
-      // console.log("data",data)
+    
+   
       const open = Boolean(this.state.anchorEl);
 
       const Item = styled(Paper)(({ theme }) => ({
@@ -351,10 +380,10 @@ idget=()=>{
 
     let id_id=  user_email.map(d=>d.id)
     return (
-      <div style={{backgroundColor:"rgb(34,193,195)"}}>
+      <div className='linked'>
          
-          {console.log("props",this.state.local_ids)}
-<div style={{backgroundColor:'black',color:"white",width:"100%",height:'80px'}}>
+          
+<div className='nav' style={{backgroundColor:'black',color:"white",width:"100%",height:'80px'}}>
 <Button
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
@@ -373,10 +402,10 @@ idget=()=>{
         onClose={this.anchorEl_close}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
-        }}
+        }} 
       >
         <Link to="/Profile">
-          <MenuItem style={{textDecoration:"none"}} >Profile</MenuItem>
+          <MenuItem sx={{textDecoration:"none"}} >Profile</MenuItem>
         </Link>
       
         
@@ -395,7 +424,6 @@ idget=()=>{
 
 </div>
 <p>{this.state.navigate}</p>
- {/* <Button variant='contained' onClick={this.data_get}>data</Button> */}
       <Modal
         keepMounted
         open={this.state.open}
@@ -432,7 +460,7 @@ idget=()=>{
             <StyledButton variant="contained" color="primary" sx={{mt:5}} onClick={this.submit_details} >
             Submit
       </StyledButton>
-            {/* <StyledButton sx={{mt:5}} onClick={this.submit_details} variant="contained" color="primary">Submit</StyledButton> */}
+           
         </Box>
         </Modal>
     
@@ -453,18 +481,18 @@ idget=()=>{
           placeholder="completed"
           multiline
           value={this.state.datafrom}
-          // onChange={(e) => this.setState({ input: e.target.value })}
+          
         />
           </Typography>
-          {/* <InputLabel id="demo-simple-select-label">Select Task</InputLabel> */}
+       
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          // onChange={(e)=>this.setState({inprogress:e.target.value})}
+     
           label="Select task "
           onChange={((e)=>this.setState({updatecatgory:e.target.value}))}
         >
-            <MenuItem value={'inprogress'} >Inprogress</MenuItem>
+            {/* <MenuItem value={'inprogress'} >Inprogress</MenuItem> */}
           <MenuItem value={'completed'}>Completed</MenuItem>
           <MenuItem value={'Open'}>Open</MenuItem>
         
@@ -474,7 +502,7 @@ idget=()=>{
         </Modal>
            <Box sx={{ flexGrow: 1 ,mt:2,ml:1,mr:1}}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {inprogress.map((d,index) => (
+        {inporo.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:'#FFFFFF'}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
@@ -504,10 +532,10 @@ idget=()=>{
           placeholder="completed"
           multiline
           value={this.state.input_completed}
-          // onChange={(e) => this.setState({ input: e.target.value })}
+        
         />
           </Typography>
-          {/* <InputLabel id="demo-simple-select-label">Select Task</InputLabel> */}
+     
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
@@ -516,7 +544,7 @@ idget=()=>{
           
         >
             <MenuItem value={'inprogress'} >Inprogress</MenuItem>
-          {/* <MenuItem value={'completed'}>Completed</MenuItem> */}
+        
           <MenuItem value={'Open'}>Open</MenuItem>
         
             </Select><br/>
@@ -529,7 +557,7 @@ idget=()=>{
 
     <Box sx={{ flexGrow: 1,mt:10 }}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {completed_1.map((d,index) => (
+        {completed_datas.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:'#FFFFFF',ml:1,mr:1}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
@@ -562,10 +590,9 @@ idget=()=>{
           placeholder="completed"
           multiline
           value={this.state.open_input}
-          // onChange={(e) => this.setState({ input: e.target.value })}
+ 
         />
           </Typography>
-          {/* <InputLabel id="demo-simple-select-label">Select Task</InputLabel> */}
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
@@ -575,7 +602,6 @@ idget=()=>{
         >
             <MenuItem value={'inprogress'} >Inprogress</MenuItem>
           <MenuItem value={'completed'}>Completed</MenuItem>
-          {/* <MenuItem value={'Open'}>Open</MenuItem> */}
         
             </Select><br/>
             <Button sx={{mt:5}} onClick={this.update_done}  variant='contained'>Submit_Done</Button>
@@ -584,7 +610,7 @@ idget=()=>{
     <h1>Open</h1>
     <Box sx={{ flexGrow: 1,mt:10 }}>
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{mt:2}} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {open_1.map((d,index) => (
+        {open_data.map((d,index) => (
           <Grid  item xs={2} sm={4} md={4} key={index}>
             <Item sx={{background:' #FFFFFF',ml:1,mr:1,mb:2}}>  <h1>id: {d.id}</h1>
                     <h1>Desc: {d.input}</h1>
